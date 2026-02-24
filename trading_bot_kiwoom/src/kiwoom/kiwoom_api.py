@@ -56,7 +56,19 @@ class KiwoomAPI:
             raise RuntimeError("PyQt5/QAxContainer import failed on Windows. Check PyQt5 and ActiveX environment.")
         self._app = QApplication.instance() or QApplication([])
         if self._ocx is None:
-            self._ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
+            try:
+                self._ocx = QAxWidget()
+                ok = self._ocx.setControl("KHOPENAPI.KHOpenAPICtrl.1")
+            except Exception as exc:
+                raise RuntimeError(
+                    "KHOpenAPI ActiveX not instantiated. Check KOA Studio/HTS install and 32/64-bit."
+                ) from exc
+
+            if not ok:
+                raise RuntimeError(
+                    "KHOpenAPI ActiveX not instantiated. Check KOA Studio/HTS install and 32/64-bit."
+                )
+
             self._ocx.OnEventConnect.connect(self._on_event_connect)
             self._ocx.OnReceiveTrData.connect(self._on_receive_tr_data)
             self._ocx.OnReceiveChejanData.connect(self._on_receive_chejan_data)

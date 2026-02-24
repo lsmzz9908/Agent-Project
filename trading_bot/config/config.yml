@@ -1,0 +1,143 @@
+app:
+  name: "shinhan_swing_bot"
+  run_mode: "paper"
+  market_mode: "BOTH"
+  overseas_markets: ["US"]
+  timezone:
+    KR: "Asia/Seoul"
+    US: "America/New_York"
+
+timeframe:
+  primary: "1D"
+  confirm: "4H"
+
+universe:
+  mode: "hybrid"
+  refresh:
+    mode: "daily"
+    KR_time: "08:30"
+    US_time: "20:30"
+  turnover_top:
+    KR:
+      top_n: 200
+      lookback_days: 20
+    US:
+      top_n: 300
+      lookback_days: 20
+  whitelist:
+    KR: []
+    US: []
+  filters:
+    price_range:
+      KR: { min: 2000, max: 200000 }
+      US: { min: 5, max: 500 }
+    min_avg_turnover:
+      KR: 2000000000
+      US: 20000000
+    min_avg_volume:
+      KR: 200000
+      US: 1000000
+    spread_limit:
+      enabled: false
+      max_pct:
+        KR: 0.25
+        US: 0.20
+    atr_range:
+      enabled: true
+      min_atr_pct:
+        KR: 1.0
+        US: 1.0
+      max_atr_pct:
+        KR: 8.0
+        US: 10.0
+    exclude_events:
+      enabled: false
+
+levels:
+  lookback_bars: 400
+  pivot_left_right: 3
+  zone_width:
+    mode: "atr"
+    atr_period: 14
+    atr_k: 0.6
+    pct: 0.5
+  min_touches: 2
+  min_score: 0.8
+  scoring:
+    w_touches: 0.5
+    w_reaction: 0.3
+    w_recency: 0.2
+
+indicators:
+  rsi: { period: 14 }
+  bollinger: { period: 20, std: 2 }
+  macd: { fast: 12, slow: 26, signal: 9 }
+
+rsi_filter:
+  long_max: 35
+  short_min: 67
+  center_band: [45, 55]
+  center_lookback: 30
+  center_max_ratio: 0.6
+
+triggers:
+  A_reversal_bb:
+    enabled: true
+    require_band_touch: true
+    reversal:
+      min_body_ratio: 0.45
+      min_close_up_pct: 0.3
+  B_div_macd:
+    enabled: true
+    divergence:
+      pivot_left_right: 3
+      min_separation: 5
+      max_separation: 80
+    macd_confirm:
+      mode: "histogram_flip"
+
+risk:
+  risk_per_trade: 0.005
+  max_positions:
+    KR: 6
+    US: 6
+  daily_loss_limit: 0.015
+  cooldown_after_losses: 3
+  sizing:
+    mode: "risk_based"
+  exits:
+    stop_loss:
+      mode: "level_or_swinglow"
+      buffer_atr_k: 0.4
+    take_profit_1:
+      enabled: true
+      mode: "next_level_or_1R"
+      partial_close_ratio: 0.5
+    trailing:
+      enabled: true
+      atr_period: 14
+      atr_k: 2.5
+    time_stop:
+      enabled: true
+      max_holding_days: 15
+
+backtest:
+  fee_rate: 0.00015
+  slippage_pct: 0.05
+  initial_cash:
+    KRW: 10000000
+    USD: 10000
+
+storage:
+  db_path: "data/trading.db"
+
+logging:
+  level: "INFO"
+  json: true
+  log_path: "logs/bot.jsonl"
+
+alerts:
+  enabled: false
+  telegram:
+    token_env: "TELEGRAM_BOT_TOKEN"
+    chat_id_env: "TELEGRAM_CHAT_ID"

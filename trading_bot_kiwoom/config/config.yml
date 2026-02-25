@@ -108,3 +108,9 @@ logging:
   json: true
   log_path: "logs/bot.jsonl"
   heartbeat_log: true
+
+
+telegram:
+  enabled: true
+  daily_summary_time: "15:50"
+  throttle_seconds: 2

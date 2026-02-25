@@ -33,3 +33,25 @@ python -m src.main --config config/config.yml --run_mode live
 - 장 시간/동시호가/시간외 제한 검증
 - 중복주문 방지(idempotency), 상태머신, chejan 이벤트 처리 로그를 매일 확인
 - 거래가 없는 날도 heartbeat/no_trade_today 로그로 정상 동작 여부 확인
+
+## 텔레그램 알림
+보안을 위해 토큰/챗ID는 **환경변수로만** 읽습니다.
+
+```bash
+export TELEGRAM_BOT_TOKEN="..."
+export TELEGRAM_CHAT_ID="..."
+```
+
+`config/config.yml`
+```yaml
+telegram:
+  enabled: true
+  daily_summary_time: "15:50"
+  throttle_seconds: 2
+```
+
+스모크 테스트:
+```bash
+python -m src.main --config config/config.yml --smoke_notify
+```
+- 환경변수가 없으면 경고 로그만 남기고 프로그램은 중단되지 않습니다.

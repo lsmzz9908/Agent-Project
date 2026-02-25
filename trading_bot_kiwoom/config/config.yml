@@ -1,0 +1,121 @@
+app:
+  name: "kiwoom_swing_bot"
+  run_mode: "paper"
+  market_mode: "KR"
+  timezone: "Asia/Seoul"
+
+timeframe:
+  primary: "1D"
+  confirm: null
+
+schedule:
+  universe_refresh_time: "08:30"
+  evaluate_time: "15:40"
+  order_execute_time: "09:00"
+
+universe:
+  mode: "hybrid"
+  whitelist_symbols: ["005930", "000660"]
+  scanner:
+    mode: "index_list"
+    index_list_path: "data/universe/kospi200.csv"
+    lookback_days: 20
+    top_n: 200
+  filters:
+    price_range: { min: 2000, max: 200000 }
+    min_avg_turnover: 2000000000
+    min_avg_volume: 200000
+    atr_range:
+      enabled: true
+      min_atr_pct: 1.0
+      max_atr_pct: 8.0
+
+levels:
+  lookback_bars: 400
+  pivot_left_right: 3
+  zone_width:
+    mode: "atr"
+    atr_period: 14
+    atr_k: 0.6
+  min_touches: 2
+  min_score: 0.8
+
+indicators:
+  rsi: { period: 14 }
+  bollinger: { period: 20, std: 2 }
+  macd: { fast: 12, slow: 26, signal: 9 }
+  atr: { period: 14 }
+
+rsi_filter:
+  long_max: 35
+  short_min: 67
+  center_band: [45, 55]
+  center_lookback: 30
+  center_max_ratio: 0.6
+
+triggers:
+  A_reversal_bb:
+    enabled: true
+    require_band_touch: true
+    reversal:
+      min_body_ratio: 0.45
+  B_div_macd:
+    enabled: true
+    divergence:
+      pivot_left_right: 3
+      min_separation: 5
+      max_separation: 80
+    macd_confirm:
+      mode: "histogram_flip"
+
+risk:
+  risk_per_trade: 0.005
+  max_positions: 6
+  daily_loss_limit: 0.015
+  cooldown_after_losses: 3
+  exits:
+    stop_loss:
+      buffer_atr_k: 0.4
+    take_profit_1:
+      enabled: true
+      partial_close_ratio: 0.5
+      mode: "next_level_or_1R"
+    trailing:
+      enabled: true
+      atr_k: 2.5
+    time_stop:
+      enabled: true
+      max_holding_days: 15
+
+idempotency:
+  enabled: true
+  scope: "symbol_per_day"
+  key_template: "{date}:{symbol}:{side}:{signal_hash}"
+
+performance:
+  worker_threads: 2
+
+backtest:
+  fee_rate: 0.00015
+  slippage_pct: 0.05
+  initial_cash: 10000000
+
+storage:
+  db_path: "data/trading.db"
+
+logging:
+  level: "INFO"
+  json: true
+  log_path: "logs/bot.jsonl"
+  heartbeat_log: true
+
+
+telegram:
+  enabled: false
+  daily_summary_time: "15:50"
+  throttle_seconds: 2
+
+
+realtime:
+  enabled: true
+  interval_seconds: 300

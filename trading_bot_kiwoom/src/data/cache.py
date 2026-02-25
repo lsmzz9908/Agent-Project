@@ -1,0 +1,2 @@
+class MemoryCache(dict):
+    pass
